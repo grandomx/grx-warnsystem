@@ -20,7 +20,8 @@ TriggerEvent('es:addGroupCommand', 'warn', 'superadmin', function(source, args, 
     -- getting identifier & warn data
     local identity = result[1].identifier
     local warnpoint = result[1].warn
-
+    
+    -- executing add point to database 
     local warn = warnpoint + warning
     MySQL.Sync.execute('UPDATE users SET warn = @warn WHERE identifier = @identifier', {
         ['@identifier'] = identifier,
