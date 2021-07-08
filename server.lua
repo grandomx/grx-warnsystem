@@ -7,19 +7,19 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 TriggerEvent('es:addGroupCommand', 'warn', 'superadmin', function(source, args, rawCommand)
     local user = tonumber(args[1]) -- player id
-    local warning = tonumber(args[2]) -- how much warning you want to give / berapa banyak warning yang ingin kamu berikan
-    local msg = table.concat(args, " ", 3) -- reason / keterangan
+    local warning = tonumber(args[2]) -- how many warning you want to give
+    local msg = table.concat(args, " ", 3) -- reason
     local warningplayer = warning
     local username = GetPlayerName(user)
     local playername = GetPlayerName(source)
 
     -- fetching users table to get the identifier & warn total
-    local identifier = GetPlayerIdentifiers(user)[1]
+    local identifier = GetPlayerIdentifiers(user)[1] -- player identifier
     local result = MySQL.Sync.fetchAll("SELECT * FROM users WHERE identifier = @identifier", { ['@identifier'] = identifier })
 
     -- getting identifier & warn data
-    local identity = result[1].identifier
-    local warnpoint = result[1].warn
+    local identity = result[1].identifier -- fetch identifier
+    local warnpoint = result[1].warn -- fetch warn count
     
     -- executing add point to database 
     local warn = warnpoint + warning
@@ -28,12 +28,12 @@ TriggerEvent('es:addGroupCommand', 'warn', 'superadmin', function(source, args, 
         ['@warn'] = warn
     })
     
-    -- Send warning to a channel / mengirimkan warning dichannel --
+    -- send warning to a channel
     warnThisShit(username, msg, "**" .. playername .. "** give **" .. warningplayer .. "** warning to " .. username .. "[" .. identity .. "], total **" .. (warnpoint + warningplayer) .. "** warning, reason **" .. msg .. "**")
     -- TriggerClientEvent('esx:showNotification', source, "Warning Sent!") -- Default notification
     TriggerClientEvent('mythic_notify:client:SendAlert', source, { type = 'success', text = "Warning Sent!" }) -- notification using mythic_notify
 
-    -- Send warning to ingame chat / mengirimkan warning dichat ingame
+    -- send warning to ingame chat
     TriggerClientEvent('chat:addMessage', -1, {
         template = '<div style="padding: 0.5vw; margin: 0.5vw; background-color: rgba(100, 0, 0, 0.4); border-radius: 5px;"><i class="fas fa-first-aid"></i> <b>{0}</b> give <b>{1}</b> warning kepada {2}[{3}], total <b>{4}</b> warning, keterangan <b>{5}</b></div>',
         args = { playername, warningplayer, username, identity, (warnpoint + warningplayer), msg }
